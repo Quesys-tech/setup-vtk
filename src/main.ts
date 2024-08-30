@@ -1,5 +1,6 @@
 import * as core from '@actions/core'
 import { wait } from './wait'
+import * as os from 'os'
 
 /**
  * The main function for the action.
@@ -11,6 +12,15 @@ export async function run(): Promise<void> {
 
     // Debug logs are only output if the `ACTIONS_STEP_DEBUG` secret is true
     core.debug(`Waiting ${ms} milliseconds ...`)
+
+    const os_type = os.type()
+    if (os_type === 'Linux') {
+      core.debug('Running on Linux')
+    } else if (os_type === 'Windows_NT') {
+      core.debug('Running on Windows')
+    } else {
+      core.debug('Running on MacOS')
+    }
 
     // Log the current timestamp, wait, then log the new timestamp
     core.debug(new Date().toTimeString())
