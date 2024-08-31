@@ -61,7 +61,9 @@ describe('action', () => {
     await testOSSpecificBehavior('Running on MacOS')
   })
 
-  async function testOSSpecificBehavior(expectedMessage: string) {
+  async function testOSSpecificBehavior(
+    expectedMessage: string
+  ): Promise<void> {
     await main.run()
     expect(runMock).toHaveReturned()
 
