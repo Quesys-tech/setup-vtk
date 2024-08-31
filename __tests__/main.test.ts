@@ -8,6 +8,7 @@
 
 import * as core from '@actions/core'
 import * as main from '../src/main'
+import * as os from 'os'
 
 // Mock the action's main function
 const runMock = jest.spyOn(main, 'run')
@@ -48,13 +49,21 @@ describe('action', () => {
     expect(runMock).toHaveReturned()
 
     // Verify that all of the core library functions were called correctly
-    expect(debugMock).toHaveBeenNthCalledWith(1, 'Waiting 500 milliseconds ...')
+    if (os.type() === 'Linux') {
+      expect(debugMock).toHaveBeenNthCalledWith(1, 'Running on Linux')
+    } else if (os.type() === 'Windows_NT') {
+      expect(debugMock).toHaveBeenNthCalledWith(1, 'Running on Windows')
+    } else {
+      expect(debugMock).toHaveBeenNthCalledWith(1, 'Running on MacOS')
+    }
+
+    expect(debugMock).toHaveBeenNthCalledWith(2, 'Waiting 500 milliseconds ...')
     expect(debugMock).toHaveBeenNthCalledWith(
-      2,
+      3,
       expect.stringMatching(timeRegex)
     )
     expect(debugMock).toHaveBeenNthCalledWith(
-      3,
+      4,
       expect.stringMatching(timeRegex)
     )
     expect(setOutputMock).toHaveBeenNthCalledWith(
