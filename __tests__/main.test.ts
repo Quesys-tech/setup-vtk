@@ -8,6 +8,9 @@
 
 import * as core from '@actions/core'
 import * as main from '../src/main'
+import * as os from 'os'
+
+jest.mock('os')
 
 // Mock the action's main function
 const runMock = jest.spyOn(main, 'run')
@@ -31,10 +34,8 @@ describe('action', () => {
     getInputMock = jest.spyOn(core, 'getInput').mockImplementation()
     setFailedMock = jest.spyOn(core, 'setFailed').mockImplementation()
     setOutputMock = jest.spyOn(core, 'setOutput').mockImplementation()
-  })
 
-  it('sets the time output', async () => {
-    // Set the action's inputs as return values from core.getInput()
+    // Default mock implementation for getInput
     getInputMock.mockImplementation(name => {
       switch (name) {
         case 'milliseconds':
@@ -43,18 +44,38 @@ describe('action', () => {
           return ''
       }
     })
+  })
 
+  it('sets the time output on Linux', async () => {
+    jest.spyOn(os, 'type').mockReturnValue('Linux')
+    await testOSSpecificBehavior('Running on Linux')
+  })
+
+  it('sets the time output on Windows', async () => {
+    jest.spyOn(os, 'type').mockReturnValue('Windows_NT')
+    await testOSSpecificBehavior('Running on Windows')
+  })
+
+  it('sets the time output on MacOS', async () => {
+    jest.spyOn(os, 'type').mockReturnValue('Darwin')
+    await testOSSpecificBehavior('Running on MacOS')
+  })
+
+  async function testOSSpecificBehavior(
+    expectedMessage: string
+  ): Promise<void> {
     await main.run()
     expect(runMock).toHaveReturned()
 
     // Verify that all of the core library functions were called correctly
-    expect(debugMock).toHaveBeenNthCalledWith(1, 'Waiting 500 milliseconds ...')
+    expect(debugMock).toHaveBeenNthCalledWith(1, expectedMessage)
+    expect(debugMock).toHaveBeenNthCalledWith(2, 'Waiting 500 milliseconds ...')
     expect(debugMock).toHaveBeenNthCalledWith(
-      2,
+      3,
       expect.stringMatching(timeRegex)
     )
     expect(debugMock).toHaveBeenNthCalledWith(
-      3,
+      4,
       expect.stringMatching(timeRegex)
     )
     expect(setOutputMock).toHaveBeenNthCalledWith(
@@ -63,7 +84,7 @@ describe('action', () => {
       expect.stringMatching(timeRegex)
     )
     expect(errorMock).not.toHaveBeenCalled()
-  })
+  }
 
   it('sets a failed status', async () => {
     // Set the action's inputs as return values from core.getInput()
