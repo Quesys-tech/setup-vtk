@@ -63,11 +63,14 @@ jobs:
 
       # If `dist/` was different than expected, commit the changes.
       - if:
-          steps.diff.outcome == 'failure' && github.event_name == 'pull_request'
+          ${{ failure() && steps.diff.outcome == 'failure' && github.event_name
+          ==          'pull_request'}}
         uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: 'chore: update transpiled JavaScript'
-      - if: steps.diff.outcome == 'failure' && github.event_name == 'commit'
+      - if:
+          ${{ failure() && steps.diff.outcome == 'failure' &&
+          github.event_name          =='commit'}}
         uses: peter-evans/create-pull-request@v7
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
