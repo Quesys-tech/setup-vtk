@@ -1,1 +1,1 @@
-FILTER_REGEX_EXCLUDE: (dist/)
+FILTER_REGEX_EXCLUDE: (dist\/.*\.js)
