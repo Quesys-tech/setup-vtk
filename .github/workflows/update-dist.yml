@@ -61,12 +61,15 @@ jobs:
             exit 1
           fi
 
-      # If `dist/` was different than expected, upload the expected version as a
-      # workflow artifact.
-      - if: ${{ failure() && steps.diff.outcome == 'failure' }}
-        name: Upload Artifact
-        id: upload
-        uses: actions/upload-artifact@v4
+      # If `dist/` was different than expected, commit the changes.
+      - if: steps.diff.outcome == 'failure' && github.event_name == 'pull_request'
+        uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          name: dist
-          path: dist/
+          commit_message: "chore: update transpiled JavaScript"
+      - if: steps.diff.outcome == 'failure' && github.event_name == 'commit'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          title: "Update transpiled JavaScript"
+          branch: update-transpiled-javascript
+          commit-message: "chore: update transpiled JavaScript"
