@@ -25658,6 +25658,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.run = run;
 const core = __importStar(__nccwpck_require__(7484));
 const wait_1 = __nccwpck_require__(910);
+const os = __importStar(__nccwpck_require__(857));
 /**
  * The main function for the action.
  * @returns {Promise<void>} Resolves when the action is complete.
@@ -25665,6 +25666,17 @@ const wait_1 = __nccwpck_require__(910);
 async function run() {
     try {
         const ms = core.getInput('milliseconds');
+        // determine the OS type
+        const os_type = os.type();
+        if (os_type === 'Linux') {
+            core.debug('Running on Linux');
+        }
+        else if (os_type === 'Windows_NT') {
+            core.debug('Running on Windows');
+        }
+        else {
+            core.debug('Running on MacOS');
+        }
         // Debug logs are only output if the `ACTIONS_STEP_DEBUG` secret is true
         core.debug(`Waiting ${ms} milliseconds ...`);
         // Log the current timestamp, wait, then log the new timestamp

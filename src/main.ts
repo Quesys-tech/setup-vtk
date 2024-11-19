@@ -1,5 +1,6 @@
 import * as core from '@actions/core'
 import { wait } from './wait'
+import * as os from 'os'
 
 /**
  * The main function for the action.
@@ -8,6 +9,16 @@ import { wait } from './wait'
 export async function run(): Promise<void> {
   try {
     const ms: string = core.getInput('milliseconds')
+
+    // determine the OS type
+    const os_type = os.type()
+    if (os_type === 'Linux') {
+      core.debug('Running on Linux')
+    } else if (os_type === 'Windows_NT') {
+      core.debug('Running on Windows')
+    } else {
+      core.debug('Running on MacOS')
+    }
 
     // Debug logs are only output if the `ACTIONS_STEP_DEBUG` secret is true
     core.debug(`Waiting ${ms} milliseconds ...`)
